@@ -246,7 +246,7 @@ function LNetworkView({ result, branch }: { result: MatchResult; branch: BranchN
         <ValueCard label={b.layout === "shunt-load" ? "Shunt (load end)" : "Shunt (source end)"} c={b.shunt} />
         <ValueCard label={b.layout === "shunt-load" ? "Series (source end)" : "Series (load end)"} c={b.series} />
       </div>
-      <p className="text-micro text-text-tertiary">L-network loaded Q is fixed at {b.Q.toFixed(3)} by the resistance ratio.</p>
+      <p className="text-micro text-text-tertiary">L-network series-arm loaded Q is fixed at {b.Q.toFixed(3)} (load reactance absorbed in the series arm).</p>
     </div>
   )
 }
