@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { calculatePA, type DeviceType, type PAResult } from "@/lib/pa"
+import { usePublishPAResult } from "@/components/engine/results-provider"
 
 import { PAChart } from "./pa-chart"
 
@@ -68,6 +69,8 @@ export function ModuleB() {
       deviceType: form.deviceType,
     })
   }, [form])
+
+  usePublishPAResult(result)
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))

@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { usePublishMatchResult } from "@/components/engine/results-provider"
+import { cappedReturnLossText, isBeyondReturnLossCap } from "@/lib/rf/return-loss"
 import {
   calculateMatch,
   formatComponent,
@@ -70,6 +72,9 @@ export function ModuleA() {
       q: Number.isFinite(q) ? q : 10,
     })
   }, [form])
+
+  const fHz = useMemo(() => freqToHz(form.freq, form.freqUnit), [form.freq, form.freqUnit])
+  usePublishMatchResult(result, fHz)
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))

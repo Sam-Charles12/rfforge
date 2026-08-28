@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ModuleA } from "@/components/modules/module-a"
 import { ModuleB } from "@/components/modules/module-b"
 import { ModuleC } from "@/components/modules/module-c"
-import { ModulePlaceholder } from "@/components/modules/module-placeholder"
+import { ModuleD } from "@/components/modules/module-d"
+import { ResultsProvider } from "@/components/engine/results-provider"
 import { useTheme } from "@/components/theme/theme-provider"
 import { cn } from "@/lib/utils"
 
@@ -41,7 +42,7 @@ function ThemeToggle() {
       onClick={toggle}
       title={dark ? "Switch to light mode" : "Switch to dark mode"}
       aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-transparent text-text-secondary transition-colors hover:border-[var(--glass-border)] hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-transparent text-text-secondary transition-colors hover:border-[var(--glass-border)] hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
     >
       <SunIcon className={cn("size-4 transition-opacity", dark ? "opacity-100" : "opacity-0 absolute")} />
       <MoonIcon className={cn("size-4 transition-opacity", dark ? "opacity-0 absolute" : "opacity-100")} />
@@ -51,64 +52,64 @@ function ThemeToggle() {
 
 function SidebarNav() {
   return (
-    <div className="sticky top-0 flex h-screen flex-col items-start gap-6 px-4 py-6">
-      <div className="glass-elevated flex h-full w-52 flex-col rounded-2xl px-3 py-5">
-        <span className="px-2 pb-5 font-mono text-title font-bold tracking-tight">RFForge</span>
+    <aside className="sidebar-pill flex w-56 shrink-0 flex-col overflow-y-auto px-5 py-6">
+      <span className="px-3 pb-4 font-mono text-title font-bold tracking-tight">RFForge</span>
 
-        <TabsList variant="line" className="w-full gap-1 bg-transparent">
-          {MODULES.map((m) => (
-            <TabsTrigger
-              key={m.id}
-              value={m.id}
-              className={cn(
-                "h-9 rounded-lg px-3 text-caption font-medium text-text-secondary hover:text-foreground data-active:text-foreground"
-              )}
-            >
-              {m.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <TabsList variant="line" className="w-full gap-1 bg-transparent">
+        {MODULES.map((m) => (
+          <TabsTrigger
+            key={m.id}
+            value={m.id}
+            className={cn(
+              "relative h-9 justify-start rounded-lg px-4 text-caption font-medium text-text-secondary transition-colors",
+              "hover:bg-muted/60 hover:text-foreground",
+              "after:hidden after:opacity-0!",
+              "data-active:bg-muted! data-active:text-foreground! data-active:font-semibold"
+            )}
+          >
+            {m.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
 
-        <div className="mt-auto flex items-center justify-between px-2 pt-4">
-          <span className="text-micro text-text-tertiary">C · Phase 3</span>
-          <ThemeToggle />
-        </div>
+      <div className="mt-auto flex items-center justify-between px-3 pt-4">
+        <span className="text-micro text-text-tertiary">C · Phase 3</span>
+        <ThemeToggle />
       </div>
-    </div>
+    </aside>
   )
 }
 
 export function AppShell() {
   return (
-    <Tabs
-      defaultValue="c"
-      orientation="vertical"
-      className="flex min-h-screen gap-4 bg-background text-foreground"
-    >
-      <SidebarNav />
+    <ResultsProvider>
+      <div className="flex min-h-screen items-stretch justify-center bg-background gap-4 p-4 text-foreground lg:gap-5 lg:p-6">
+        <Tabs
+          defaultValue="c"
+          orientation="vertical"
+          className="flex h-[calc(100vh-2rem)] w-full gap-4 lg:h-[calc(100vh-3rem)] lg:gap-5"
+        >
+          <SidebarNav />
 
-      <main className="min-w-0 flex-1 px-6 pt-6 pb-16">
-        <TabsContent value="a">
-          <ModuleA />
-        </TabsContent>
+          <div className="dashboard-panel min-w-0 flex-1 overflow-y-auto px-6 py-6 lg:px-9 lg:py-8">
+            <TabsContent value="a">
+              <ModuleA />
+            </TabsContent>
 
-        <TabsContent value="b">
-          <ModuleB />
-        </TabsContent>
+            <TabsContent value="b">
+              <ModuleB />
+            </TabsContent>
 
-        <TabsContent value="c">
-          <ModuleC />
-        </TabsContent>
+            <TabsContent value="c">
+              <ModuleC />
+            </TabsContent>
 
-        <TabsContent value="d">
-          <ModulePlaceholder
-            code="D"
-            title="AI Explanation Layer"
-            accentClass="accent-bg-ai"
-            description="Plain-language engineering commentary on calculated results. Read-only relative to the calculation modules."
-          />
-        </TabsContent>
-      </main>
-    </Tabs>
+            <TabsContent value="d">
+              <ModuleD />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+    </ResultsProvider>
   )
 }

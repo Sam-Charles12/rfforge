@@ -9,7 +9,8 @@
     "lint": "eslint",
     "validate:pa": "tsx scripts/validate-pa.ts",
     "validate:match": "tsx scripts/validate-match.ts",
-    "validate:fscale": "tsx scripts/validate-fscale.ts"
+    "validate:fscale": "tsx scripts/validate-fscale.ts",
+    "validate:ai": "tsx scripts/validate-ai.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

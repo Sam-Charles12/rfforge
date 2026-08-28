@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { calculateScale, type BranchName, type NetworkTopology, type ScaleResult } from "@/lib/fscale"
+import { usePublishScaleResult } from "@/components/engine/results-provider"
 
 import { FScaleChart } from "./fscale-chart"
 
@@ -83,6 +84,8 @@ export function ModuleC() {
       steps: STEPS,
     })
   }, [form])
+
+  usePublishScaleResult(result)
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [key]: e.target.value }))
