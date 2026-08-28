@@ -207,7 +207,13 @@ export function ModuleA() {
           <StatCard
             label="Matched |Γ|"
             value={result?.realizable ? "≈0" : "—"}
-            unit={result?.realizable ? result.topology === "l" ? "" : `(-${fnum(result.matchedReflection.returnLossDb)} dB)` : ""}
+            unit={result?.realizable
+              ? result.topology === "l"
+                ? ""
+                : isBeyondReturnLossCap(result.matchedReflection.returnLossDb)
+                  ? `(${cappedReturnLossText(result.matchedReflection.returnLossDb)})`
+                  : `(-${fnum(result.matchedReflection.returnLossDb)} dB)`
+              : ""}
             accent
           />
         </CardContent>
