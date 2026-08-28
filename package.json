@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "validate:pa": "tsx scripts/validate-pa.ts",
+    "validate:match": "tsx scripts/validate-match.ts",
+    "validate:fscale": "tsx scripts/validate-fscale.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -31,6 +34,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }
