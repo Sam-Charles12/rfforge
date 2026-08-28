@@ -132,6 +132,10 @@ export function lNetwork(Zl: Complex, Z0: number, f: number): LNetworkResult {
           branch: shunt.type === "C" ? "lp" : "hp",
           shunt: { ...shunt, reactance: -1 / Bshunt },
           series: { ...series, reactance: Xseries },
+          // Loaded-Q convention (shunt-load, R > Z0): Q = |X_series,net / R_L|,
+          // series-arm reactance over the load resistance. The load reactance X
+          // is absorbed into the shunt branch for this shape; this reduces to the
+          // simple resistance-ratio form sqrt(R/Rmin - 1) only when X = 0.
           Q: Math.abs(Xseries / R),
           tunable: false,
           layout: "shunt-load",
@@ -154,6 +158,10 @@ export function lNetwork(Zl: Complex, Z0: number, f: number): LNetworkResult {
           branch: series.type === "L" ? "lp" : "hp",
           shunt: { ...shunt, reactance: -1 / Bshunt },
           series: { ...series, reactance: Xs1 },
+          // Loaded-Q convention (series-load, R < Z0): Q = |X_series,net / R_L|,
+          // where X_series,net = Xs1 = Xprime - X absorbs the load reactance X
+          // into the series arm. This reduces to the simple resistance-ratio
+          // form sqrt(Z0/R - 1) only when the load reactance X = 0.
           Q: Math.abs(Xs1 / R),
           tunable: false,
           layout: "series-load",
