@@ -148,3 +148,82 @@ export function explainFromTemplate(result: RfResult): string {
       return explainScale(result)
   }
 }
+
+/* ------------------------------------------------------------------------ */
+/* Follow-up responder (deterministic fallback for chat questions).          */
+/*                                                                           */
+/* The live Groq path is the real multi-turn engine. When it's unavailable,  */
+/* this answers value-scoped follow-ups honestly from the provided numbers,  */
+/* and otherwise names the metrics it can talk about instead of fabricating. */
+/* ------------------------------------------------------------------------ */
+
+const has = (q: string, ...words: string[]) =>
+  words.some((w) => q.includes(w))
+
+function explainFollowUpMatching(r: MatchingResult, q: string): string {
+  const lower = q.toLowerCase()
+  if (has(lower, "bandwidth", "selectiv", "narrow", "broad", "bw")) {
+    return `The matched network's -3 dB bandwidth is roughly ${mhz(r.bandwidthHz)} MHz. It follows from the loaded quality factor of ${one(r.qFactor)}: higher Q gives a narrower, more selective match, whereas lower Q widens it.`
+  }
+  if (has(lower, "q", "quality")) {
+    return `The loaded quality factor of the matching network is ${one(r.qFactor)}. Because bandwidth approximates the design frequency divided by Q, this value directly controls how quickly the match degrades away from the center of the band.`
+  }
+  if (has(lower, "return loss", "match", "reflection", "gamma", "reflected")) {
+    return isBeyondReturnLossCap(r.matchedReturnLossDb)
+      ? `The matched return loss is essentially perfect at the design frequency (greater than ${RETURN_LOSS_CAP_DB} dB, effectively unmeasurable in a real circuit), improved from ${two(r.loadReturnLossDb)} dB when unmatched.`
+      : `The match improves the return loss from ${two(r.loadReturnLossDb)} dB (unmatched) to ${two(r.matchedReturnLossDb)} dB (matched). Values at or above 20 dB are excellent; 10–20 dB is acceptable.`
+  }
+  if (has(lower, "topology", "pi", "t-network", "l-network")) {
+    return `This is a ${r.topology.toUpperCase()} matching network${r.realizable ? "" : " that could not be realized for these impedances"}. The topology choice trades component count and achievable loaded Q against how precisely it can transform the load impedance.`
+  }
+  return `I can comment on the calculated values: topology ${r.topology.toUpperCase()}, loaded Q ${one(r.qFactor)}, -3 dB bandwidth ${mhz(r.bandwidthHz)} MHz, and matched return loss ${two(r.matchedReturnLossDb)} dB. Ask about one of these and I'll explain it in terms of the numbers shown.`
+}
+
+function explainFollowUpPA(r: PAResultSummary, q: string): string {
+  const lower = q.toLowerCase()
+  if (has(lower, "gain")) {
+    return `The small-signal gain is ${one(r.gainDb)} dB. Gain falls as drive rises once the stage approaches saturation at ${one(r.pSatDbm)} dBm.`
+  }
+  if (has(lower, "saturat", "psat", "max power")) {
+    return `Saturation output power is ${one(r.pSatDbm)} dBm. The 1 dB compression point sits at ${one(r.p1dBOutDbm)} dBm output (${one(r.p1dBInDbm)} dBm input), ${two(r.pSatDbm - r.p1dBOutDbm)} dB below it.`
+  }
+  if (has(lower, "compression", "1 db", "1db", "p1db", "linear")) {
+    return `The 1 dB compression point is at ${one(r.p1dBInDbm)} dBm input / ${one(r.p1dBOutDbm)} dBm output. The ${two(r.pSatDbm - r.p1dBOutDbm)} dB gap between there and saturation describes how abruptly the gain rolls off.`
+  }
+  if (has(lower, "efficien", "pae", "drain")) {
+    return `Peak power-added efficiency is ${one(r.paePeakPct)}% with peak ${r.drainLabel.toLowerCase()} efficiency of ${one(r.drainEffPeakPct)}%. Higher PAE means less DC power is wasted as heat at the operating drive level.`
+  }
+  return `I can comment on the calculated values: gain ${one(r.gainDb)} dB, Psat ${one(r.pSatDbm)} dBm, P1dB ${one(r.p1dBInDbm)} dBm in / ${one(r.p1dBOutDbm)} dBm out, peak PAE ${one(r.paePeakPct)}%, and peak drain efficiency ${one(r.drainEffPeakPct)}%. Ask about one of these and I'll explain it in terms of the numbers shown.`
+}
+
+function explainFollowUpScale(r: ScaleResultSummary, q: string): string {
+  const lower = q.toLowerCase()
+  if (has(lower, "self-resonant", "srf", "resonance")) {
+    return `The dominant inductor self-resonates near ${two(r.srfGHz)} GHz. Beyond there the effective Q collapses, which is why loss climbs so sharply toward the end of the sweep (to ${two(r.ilAtFmaxDb)} dB, an effective Q of about ${two(r.qAtFmax)}).`
+  }
+  if (has(lower, "insertion loss", "loss", "il")) {
+    return `Insertion loss reaches ${two(r.ilAtFmaxDb)} dB at the upper sweep edge, ${two(r.ilRiseDb)} dB above the low-frequency value, with a peak of ${two(r.ilPeakDb)} dB. This is the signature of inductor loss growing toward self-resonance.`
+  }
+  if (has(lower, "q", "quality")) {
+    return `Effective inductor Q at the end of the sweep is ${two(r.qAtFmax)}. As frequency approaches the self-resonance at ${two(r.srfGHz)} GHz, Q collapses and losses rise accordingly.`
+  }
+  if (has(lower, "peak", "bump", "resonant")) {
+    return `The peak of ${two(r.ilPeakDb)} dB sits ${two(r.ilPeakDb - r.ilAtFmaxDb)} dB above the band edge — a resonant loss bump rather than a smooth monotonic rise, consistent with the inductor nearing self-resonance.`
+  }
+  return `I can comment on the calculated values: SRF ${two(r.srfGHz)} GHz, insertion loss ${two(r.ilAtFmaxDb)} dB at the sweep end (rise ${two(r.ilRiseDb)} dB), peak ${two(r.ilPeakDb)} dB, and effective Q ${two(r.qAtFmax)}. Ask about one of these and I'll explain it in terms of the numbers shown.`
+}
+
+/**
+ * Deterministic answer to a downstream follow-up question. Pure — derives text
+ * only from the supplied numbers (FR-D3); never fabricates values.
+ */
+export function explainFollowUpFromTemplate(result: RfResult, question: string): string {
+  switch (result.source) {
+    case "A":
+      return explainFollowUpMatching(result, question)
+    case "B":
+      return explainFollowUpPA(result, question)
+    case "C":
+      return explainFollowUpScale(result, question)
+  }
+}

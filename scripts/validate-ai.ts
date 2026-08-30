@@ -16,7 +16,7 @@
  * Run: npm run validate:ai
  */
 import { getMockResult, mockHighPAE } from "../lib/ai/mock-results"
-import { explainFromTemplate } from "../lib/ai/template"
+import { explainFromTemplate, explainFollowUpFromTemplate } from "../lib/ai/template"
 import type { RfResult } from "../types/rf-results"
 import { buildMatchingResult, buildPAResult, buildScaleResult } from "../types/rf-results"
 import { calculateMatch } from "../lib/match"
@@ -101,6 +101,27 @@ check(
   "low-PAE and high-PAE wording differ"
 )
 check("Conditional reflects thresholds", highPae.includes("excellent") !== lowPae.includes("excellent"))
+
+/* --- Follow-up responder (deterministic chat fallback) --- */
+const qBandwidth = explainFollowUpFromTemplate(ma, "what is the bandwidth?")
+const qGain = explainFollowUpFromTemplate(mb, "explain the gain")
+const qIl = explainFollowUpFromTemplate(mc, "why is insertion loss high?")
+check("Follow-up A: non-empty", qBandwidth.trim().length > 20, `${qBandwidth.trim().length} chars`)
+check("Follow-up B: non-empty", qGain.trim().length > 20, `${qGain.trim().length} chars`)
+check("Follow-up C: non-empty", qIl.trim().length > 20, `${qIl.trim().length} chars`)
+check(
+  "Follow-up A: answers the bandwidth question from the values",
+  qBandwidth.includes((ma.bandwidthHz / 1e6).toFixed(1) + " MHz")
+)
+check(
+  "Follow-up B: answers the gain question from the values",
+  qGain.includes(mb.gainDb.toFixed(1) + " dB")
+)
+const qOffTopic = explainFollowUpFromTemplate(mb, "tell me about weather in london")
+check(
+  "Follow-up off-topic: does not fabricate, names available metrics",
+  qOffTopic.includes("gain") && qOffTopic.includes("Psat")
+)
 
 /* --- FR-D3 / purity: frozen input is not mutated; values are not altered --- */
 const frozen = Object.freeze({ ...mb })
