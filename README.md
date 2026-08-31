@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RFForge
 
-## Getting Started
+RF/PA engineering calculator for impedance matching, power-amplifier performance, and frequency-scaling analysis, with an AI explanation layer. Built for RF and microwave engineers who want fast, auditable worked examples alongside interactive visualisation.
 
-First, run the development server:
+## Modules
+
+| Module | What it does |
+|---|---|
+| **A — Matching** | L/Pi/T impedance matching network design. Takes complex source and load impedances, returns Q factor, component values, and topology. |
+| **B — PA Performance** | Power amplifier gain compression, PAE, drain efficiency, and P1dB from Rapp-model sweep. |
+| **C — Frequency Scaling** | Insertion-loss and effective-inductance curves across sub-6 GHz to sub-THz, including parasitic SRF. |
+| **D — AI Explanation** | Groq-powered natural-language explanation of calculation results, with template fallback. |
+
+## Getting started
+
+```bash
+npm install
+npm run build
+npm run start
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+For development with hot reload:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Validation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Validation scripts cover core-calculation accuracy (SC-1/SC-2) and can be extended for domain-expert (SC-3) and standalone-presentability (SC-4) reviews. Full results, methodology, and reviewer checklists live in [VALIDATION.md](./VALIDATION.md).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run validate:final    # SC-1 + SC-2 (automated)
+npm run validate:match    # Module A — L/Pi/T network
+npm run validate:pa       # Module B — PA performance
+npm run validate:fscale   # Module C — frequency scaling
+npm run validate:ai       # Module D — AI explanation layer
+```
 
-## Learn More
+## Tech stack
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js 16 / React 19 / TypeScript
+- Tailwind CSS v4 + shadcn/ui (base-mira)
+- Recharts for visualisation
+- Groq API for AI explanations (compound model)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private project — see repository for details.

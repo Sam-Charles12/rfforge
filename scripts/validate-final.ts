@@ -6,7 +6,7 @@
  * SC-2: Module C produces a visibly increasing loss/degradation trend as
  *       frequency increases from sub-6 GHz to sub-THz.
  *
- * Run: npx tsx scripts/validate-final.ts
+ * Run: npm run validate:final
  */
 import { calculateMatch } from "../lib/match"
 import { lNetwork } from "../lib/match/math"
