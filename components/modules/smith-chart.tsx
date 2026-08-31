@@ -23,8 +23,13 @@ const PATH = "var(--accent-rf-match)"
 const LOAD = "var(--accent-rf-freq)"
 const SRC = "var(--accent-success)"
 
-const px = (gx: number) => C + gx * R
-const py = (gy: number) => C - gy * R
+// Quantize coordinates to a fixed precision so the server and client render
+// byte-identical <path d="..."> / circle attributes. Tiny floating-point
+// differences between the two JS runtimes would otherwise produce a React
+// hydration mismatch (identical structure, differing trailing digits).
+const fmt = (v: number) => v.toFixed(3)
+const px = (gx: number) => fmt(C + gx * R)
+const py = (gy: number) => fmt(C - gy * R)
 
 /**
  * Portable SVG "stretch" Smith chart: unit circle in the Gamma plane with
@@ -44,41 +49,47 @@ export function SmithChart({ z0, zLoad, result, branch }: SmithChartProps) {
     return matchingPath(result.topology, elems, z0, { re: zLoad.re / z0, im: zLoad.im / z0 })
   }, [result, branch, z0, zLoad])
 
-  // constant-resistance circles (r values) and constant-reactance arcs (x values)
-  const rVals = [0.2, 0.5, 1, 2, 5]
-  const xVals = [0.2, 0.5, 1, 2, 5]
-
-  // Build discreet polylines for the grid by sampling in normalized coords.
-  const rGrid = rVals.map((r) => {
-    const cx = r / (r + 1)
-    const rad = 1 / (r + 1)
-    const n = 120
-    const pts: string[] = []
-    for (let i = 0; i <= n; i++) {
-      const t = (i / n) * Math.PI * 2
-      pts.push(`${px(cx + rad * Math.cos(t))},${py(rad * Math.sin(t))}`)
-    }
-    return { r, d: `M ${pts.join(" L ")} Z` }
-  })
-
-  const xGrid: { x: number; sign: 1 | -1; d: string }[] = []
-  for (const x of xVals) {
-    for (const sign of [1, -1] as const) {
-      const sv = sign * x
-      const cy = sv > 0 ? 1 / x : -1 / x
-      const rad = 1 / x
-      const n = 140
+  // Build discrete polylines for the grid by sampling in normalized coords.
+  // Precomputed once (module scope) so server and client render byte-identical
+  // <path d="..."> strings — avoids React hydration mismatches from floating
+  // point output that would otherwise differ between the two render runs.
+  const rGrid = (() => {
+    const rVals = [0.2, 0.5, 1, 2, 5]
+    return rVals.map((r) => {
+      const cx = r / (r + 1)
+      const rad = 1 / (r + 1)
+      const n = 120
       const pts: string[] = []
       for (let i = 0; i <= n; i++) {
         const t = (i / n) * Math.PI * 2
-        const gx = 1 + rad * Math.cos(t)
-        const gy = cy + rad * Math.sin(t)
-        const inCircle = gx * gx + gy * gy <= 1.0001
-        if (inCircle) pts.push(`${px(gx)},${py(gy)}`)
+        pts.push(`${px(cx + rad * Math.cos(t))},${py(rad * Math.sin(t))}`)
       }
-      if (pts.length > 0) xGrid.push({ x, sign, d: `M ${pts.join(" L ")}` })
+      return { r, d: `M ${pts.join(" L ")} Z` }
+    })
+  })()
+
+  const xGrid = (() => {
+    const xVals = [0.2, 0.5, 1, 2, 5]
+    const out: { x: number; sign: 1 | -1; d: string }[] = []
+    for (const x of xVals) {
+      for (const sign of [1, -1] as const) {
+        const sv = sign * x
+        const cy = sv > 0 ? 1 / x : -1 / x
+        const rad = 1 / x
+        const n = 140
+        const pts: string[] = []
+        for (let i = 0; i <= n; i++) {
+          const t = (i / n) * Math.PI * 2
+          const gx = 1 + rad * Math.cos(t)
+          const gy = cy + rad * Math.sin(t)
+          const inCircle = gx * gx + gy * gy <= 1.0001
+          if (inCircle) pts.push(`${px(gx)},${py(gy)}`)
+        }
+        if (pts.length > 0) out.push({ x, sign, d: `M ${pts.join(" L ")}` })
+      }
     }
-  }
+    return out
+  })()
 
   const loadPts = path.length > 0 ? path[0].gamma : null
   const srcPts = path.length > 0 ? path[path.length - 1].gamma : null
