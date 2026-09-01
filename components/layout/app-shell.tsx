@@ -72,8 +72,7 @@ function SidebarNav() {
         ))}
       </TabsList>
 
-      <div className="mt-auto flex items-center justify-between px-3 pt-4">
-        <span className="text-micro text-text-tertiary">C · Phase 3</span>
+      <div className="mt-auto flex items-center justify-end px-3 pt-4">
         <ThemeToggle />
       </div>
     </aside>

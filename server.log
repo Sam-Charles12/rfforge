@@ -1,0 +1,12 @@
+
+> rfforge@0.1.0 start
+> next start
+
+▲ Next.js 16.3.3
+- Local:         http://localhost:3000
+- Network:       http://10.221.150.200:3000
+✓ Ready in 1174ms
+⚠ Warning: Next.js ignored package-lock.json in C:\Users\Owner because it is outside the current Git repository (C:\Users\Owner\OneDrive\Desktop\rfforge).
+ To use this directory, set `outputFileTracingRoot` in your Next.js config.
+
+✓ Running next.config.ts took 352ms
