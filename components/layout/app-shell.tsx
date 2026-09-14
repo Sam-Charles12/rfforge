@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ModuleA } from "@/components/modules/module-a"
 import { ModuleB } from "@/components/modules/module-b"
@@ -33,6 +34,25 @@ function MoonIcon({ className }: { className?: string }) {
   )
 }
 
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="18" x2="20" y2="18" />
+    </svg>
+  )
+}
+
+function CloseIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  )
+}
+
 function ThemeToggle() {
   const { theme, toggle } = useTheme()
   const dark = theme === "dark"
@@ -50,29 +70,57 @@ function ThemeToggle() {
   )
 }
 
-function SidebarNav() {
+function Navigation({ activeTab }: { activeTab: string }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const currentModule = MODULES.find((m) => m.id === activeTab) ?? MODULES[0]
+
   return (
-    <aside className="sidebar-pill flex w-56 shrink-0 flex-col overflow-y-auto px-5 py-6">
-      <span className="px-3 pb-4 font-mono text-title font-bold tracking-tight">RFForge</span>
-
-      <TabsList variant="line" className="w-full gap-1 bg-transparent">
-        {MODULES.map((m) => (
-          <TabsTrigger
-            key={m.id}
-            value={m.id}
-            className={cn(
-              "relative h-9 justify-start rounded-lg px-4 text-caption font-medium text-text-secondary transition-colors",
-              "hover:bg-muted/60 hover:text-foreground",
-              "after:hidden after:opacity-0!",
-              "data-active:bg-muted! data-active:text-foreground! data-active:font-semibold"
-            )}
+    <aside className="sidebar-pill flex shrink-0 flex-col gap-2.5 rounded-2xl border border-border-subtle/80 bg-surface-1/50 p-3 backdrop-blur-md sm:p-4 lg:w-56 lg:gap-0 lg:overflow-y-auto lg:rounded-2xl lg:border-none lg:bg-transparent lg:p-0 lg:backdrop-blur-none lg:px-5 lg:py-6">
+      {/* Brand, Active Module Badge & Mobile Controls */}
+      <div className="flex items-center justify-between px-1 lg:block lg:px-3 lg:pb-4">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-headline font-bold tracking-tight sm:text-title">RFForge</span>
+          <span className="rounded-md border border-border-subtle bg-surface-2 px-2 py-0.5 font-mono text-[11px] font-medium text-text-secondary lg:hidden">
+            {currentModule.label}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={menuOpen}
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-border-subtle bg-surface-1 text-text-secondary transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
           >
-            {m.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+            {menuOpen ? <CloseIcon className="size-4" /> : <MenuIcon className="size-4" />}
+          </button>
+        </div>
+      </div>
 
-      <div className="mt-auto flex items-center justify-end px-3 pt-4">
+      {/* Tabs navigation list — collapsed on mobile unless opened, always visible on desktop */}
+      <div className={cn("overflow-hidden transition-all duration-200 lg:overflow-visible", menuOpen ? "block" : "hidden lg:block")}>
+        <TabsList variant="line" className="flex w-full flex-col gap-1 bg-transparent p-0 pt-1 lg:pt-0">
+          {MODULES.map((m) => (
+            <TabsTrigger
+              key={m.id}
+              value={m.id}
+              onClick={() => setMenuOpen(false)}
+              className={cn(
+                "relative h-10 w-full justify-start rounded-lg px-3.5 text-caption font-medium text-text-secondary transition-colors sm:px-4 lg:h-9",
+                "hover:bg-muted/60 hover:text-foreground",
+                "after:hidden after:opacity-0!",
+                "data-active:bg-muted! data-active:text-foreground! data-active:font-semibold"
+              )}
+            >
+              {m.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+
+      {/* Desktop theme toggle */}
+      <div className="mt-auto hidden items-center justify-end px-3 pt-4 lg:flex">
         <ThemeToggle />
       </div>
     </aside>
@@ -80,17 +128,23 @@ function SidebarNav() {
 }
 
 export function AppShell() {
+  const [activeTab, setActiveTab] = useState<string>("c")
+
   return (
     <ResultsProvider>
-      <div className="flex min-h-screen items-stretch justify-center bg-background gap-4 p-4 text-foreground lg:gap-5 lg:p-6">
+      <div className="flex min-h-screen items-stretch justify-center bg-background p-2.5 text-foreground sm:p-4 lg:gap-5 lg:p-6">
         <Tabs
+          value={activeTab}
+          onValueChange={(val) => {
+            if (val) setActiveTab(val)
+          }}
           defaultValue="c"
           orientation="vertical"
-          className="flex h-[calc(100vh-2rem)] w-full gap-4 lg:h-[calc(100vh-3rem)] lg:gap-5"
+          className="flex w-full flex-col gap-3 sm:gap-4 lg:h-[calc(100vh-3rem)] lg:flex-row lg:gap-5"
         >
-          <SidebarNav />
+          <Navigation activeTab={activeTab} />
 
-          <div className="dashboard-panel min-w-0 flex-1 overflow-y-auto px-6 py-6 lg:px-9 lg:py-8">
+          <div className="dashboard-panel min-w-0 flex-1 overflow-y-auto p-3.5 sm:p-6 lg:px-9 lg:py-8">
             <TabsContent value="a">
               <ModuleA />
             </TabsContent>

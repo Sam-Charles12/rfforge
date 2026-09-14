@@ -89,7 +89,7 @@ export function ModuleA() {
           <CardTitle className="text-headline">Match Parameters</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Load R" unit="Ω">
               <Input value={form.zlRe} onChange={set("zlRe")} inputMode="decimal" className="numeric" />
             </Field>
@@ -97,7 +97,7 @@ export function ModuleA() {
               <Input value={form.zlIm} onChange={set("zlIm")} inputMode="decimal" className="numeric" />
             </Field>
           </div>
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Reference Z₀" unit="Ω">
               <Input value={form.z0} onChange={set("z0")} inputMode="decimal" className="numeric" />
             </Field>
@@ -146,7 +146,7 @@ export function ModuleA() {
             </Field>
           )}
 
-          <div className="flex items-center justify-between gap-3 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
             <Badge variant="secondary">
               {result?.realizable
                 ? form.topology === "l"
@@ -158,6 +158,7 @@ export function ModuleA() {
               type="button"
               variant="outline"
               size="sm"
+              className="text-xs"
               title="Click to toggle between low-pass and high-pass filter topology"
               aria-label="Toggle between low-pass and high-pass branch"
               onClick={() => setForm((f) => ({ ...f, branch: f.branch === "lp" ? "hp" : "lp" }))}
@@ -200,7 +201,7 @@ export function ModuleA() {
         <CardHeader>
           <CardTitle className="text-headline">Match Quality</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-6">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           <StatCard label="Load |Γ|" value={result ? fnum(result.loadReflection.mag) : "—"} accent />
           <StatCard label="Load return loss" value={result ? fnum(result.loadReflection.returnLossDb) + "" : "—"} unit="dB" />
           <StatCard label="Phase" value={result ? fnum(result.loadReflection.phaseDeg) + "" : "—"} unit="°" />
@@ -242,7 +243,7 @@ function LNetworkView({ result, branch }: { result: MatchResult; branch: BranchN
   return (
     <div className="space-y-4">
       <SchematicL layout={b.layout} shunt={b.shunt} series={b.series} />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
         <ValueCard label={b.layout === "shunt-load" ? "Shunt (load end)" : "Shunt (source end)"} c={b.shunt} />
         <ValueCard label={b.layout === "shunt-load" ? "Series (source end)" : "Series (load end)"} c={b.series} />
       </div>
@@ -258,7 +259,7 @@ function PiTView({ result, branch }: { result: MatchResult; branch: BranchName }
   return (
     <div className="space-y-4">
       <SchematicPiT pi={pi} elems={elems} />
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
         <ValueCard label={pi ? "Shunt (source)" : "Series (source)"} c={pi ? elems.leftShunt : elems.series} />
         <ValueCard label="Series arm / shunt" c={pi ? elems.series : elems.leftShunt} />
         <ValueCard label={pi ? "Shunt (load)" : "Series (load)"} c={elems.rightShunt} />
@@ -269,7 +270,7 @@ function PiTView({ result, branch }: { result: MatchResult; branch: BranchName }
 
 function ValueCard({ label, c }: { label: string; c: ComponentValue }) {
   return (
-    <div className="rounded-lg border border-border-subtle bg-surface-1 p-4">
+    <div className="rounded-lg border border-border-subtle bg-surface-1 p-3 sm:p-4">
       <span className="text-micro text-text-tertiary">{label}</span>
       <div className="mt-1 flex items-baseline gap-1">
         <span className="text-data-md text-text-primary">{formatComponent(c.value, c.type)}</span>
@@ -283,7 +284,7 @@ function ValueCard({ label, c }: { label: string; c: ComponentValue }) {
 function SchematicL({ layout, shunt, series }: { layout: "shunt-load" | "series-load"; shunt: ComponentValue; series: ComponentValue }) {
   const shuntNearLoad = layout === "shunt-load"
   return (
-    <svg viewBox="0 0 320 64" className="h-14 w-full">
+    <svg viewBox="0 0 320 64" className="h-14 w-full max-w-full overflow-hidden">
       <line x1={8} y1={32} x2={58} y2={32} stroke="var(--svg-line)" strokeWidth={1.5} />
       <line x1={262} y1={32} x2={312} y2={32} stroke="var(--svg-line)" strokeWidth={1.5} />
       {/* source */}
@@ -316,7 +317,7 @@ function SchematicPiT({ pi, elems }: { pi: boolean; elems: NetworkElements }) {
   const b = pi ? elems.series : elems.leftShunt // middle
   const c = elems.rightShunt // load-side element
   return (
-    <svg viewBox="0 0 320 64" className="h-16 w-full">
+    <svg viewBox="0 0 320 64" className="h-16 w-full max-w-full overflow-hidden">
       <line x1={8} y1={32} x2={312} y2={32} stroke="var(--svg-line)" strokeWidth={1.5} />
       <line x1={8} y1={56} x2={312} y2={56} stroke="var(--svg-line-soft)" strokeWidth={1} />
       <text x={8} y={18} fontSize={10} fill="var(--text-secondary)" fontFamily="var(--font-mono)">src</text>
@@ -365,7 +366,7 @@ function Field({ label, unit, children }: { label: string; unit?: string; childr
 
 function StatCard({ label, value, unit, accent }: { label: string; value: string; unit?: string; accent?: boolean }) {
   return (
-    <Card className={`flex flex-col justify-between rounded-lg border bg-surface-1 p-6 ${accent ? "accent-bg-rf-match" : "border-border-subtle"}`}>
+    <Card className={`flex flex-col justify-between rounded-lg border bg-surface-1 p-4 sm:p-5 lg:p-6 ${accent ? "accent-bg-rf-match" : "border-border-subtle"}`}>
       <span className="text-micro text-text-tertiary">{label}</span>
       <span className="text-data-lg mt-2 text-text-primary">
         {value}

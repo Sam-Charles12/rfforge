@@ -98,7 +98,7 @@ export function ModuleC() {
           <CardTitle className="text-headline">Network Design · from Module A</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Load R" unit="Ω">
               <Input value={form.zlRe} onChange={set("zlRe")} inputMode="decimal" className="numeric" />
             </Field>
@@ -106,7 +106,7 @@ export function ModuleC() {
               <Input value={form.zlIm} onChange={set("zlIm")} inputMode="decimal" className="numeric" />
             </Field>
           </div>
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Reference Z₀" unit="Ω">
               <Input value={form.z0} onChange={set("z0")} inputMode="decimal" className="numeric" />
             </Field>
@@ -132,7 +132,7 @@ export function ModuleC() {
               <Input value={form.q} onChange={set("q")} inputMode="decimal" className="numeric" />
             </Field>
           )}
-          <div className="flex items-center justify-between gap-3 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
             <Badge variant="secondary">
               {result?.realizable
                 ? form.topology === "l"
@@ -145,6 +145,7 @@ export function ModuleC() {
                 type="button"
                 variant="outline"
                 size="sm"
+                className="text-xs"
                 title="Click to toggle between the low-pass and high-pass matching prototype"
                 aria-label="Toggle between low-pass and high-pass branch"
                 onClick={() => setForm((f) => ({ ...f, branch: f.branch === "lp" ? "hp" : "lp" }))}
@@ -165,7 +166,7 @@ export function ModuleC() {
           <CardTitle className="text-headline">Parasitics &amp; Sweep</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Parasitic C_p" unit="pF">
               <Input value={form.cpPf} onChange={set("cpPf")} inputMode="decimal" className="numeric" />
             </Field>
@@ -173,7 +174,7 @@ export function ModuleC() {
               <Input value={form.inductorQ} onChange={set("inductorQ")} inputMode="decimal" className="numeric" />
             </Field>
           </div>
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Sweep start" unit="GHz ≥1">
               <Input value={form.fminGHz} onChange={set("fminGHz")} inputMode="decimal" className="numeric" />
             </Field>
@@ -192,7 +193,7 @@ export function ModuleC() {
         <CardHeader>
           <CardTitle className="text-headline">Degradation at Scale</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-6">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           <StatCard label="SRF (dominant L)" value={result ? fmtFreq(result.srfHz) : "—"} accent />
           <StatCard label="IL @ f_max" value={result ? fnum(result.ilAtFmax) : "—"} unit="dB" />
           <StatCard label="Inductor Q @ f_max" value={result ? fnum(result.qAtFmax) : "—"} />
@@ -202,10 +203,10 @@ export function ModuleC() {
 
       {/* Primary chart — full width */}
       <Card className="bento-full glass accent-bg-rf-freq">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <CardTitle className="text-headline">Insertion Loss &amp; Inductor Q vs Frequency</CardTitle>
           {result?.realizable && (
-            <Badge variant="outline">
+            <Badge variant="outline" className="w-fit">
               SRF {fmtFreq(result.srfHz)} · IL@fmax {fnum(result.ilAtFmax)} dB
             </Badge>
           )}
@@ -236,7 +237,7 @@ function Field({ label, unit, children }: { label: string; unit?: string; childr
 
 function StatCard({ label, value, unit, accent }: { label: string; value: string; unit?: string; accent?: boolean }) {
   return (
-    <Card className={`flex flex-col justify-between rounded-lg border bg-surface-1 p-6 ${accent ? "accent-bg-rf-freq" : "border-border-subtle"}`}>
+    <Card className={`flex flex-col justify-between rounded-lg border bg-surface-1 p-4 sm:p-5 lg:p-6 ${accent ? "accent-bg-rf-freq" : "border-border-subtle"}`}>
       <span className="text-micro text-text-tertiary">{label}</span>
       <span className="text-data-lg mt-2 text-text-primary">
         {value}

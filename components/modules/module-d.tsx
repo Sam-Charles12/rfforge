@@ -182,14 +182,14 @@ export function ModuleD() {
           Transcript inside is solid `--surface-1` because glass is prohibited
           for dense text (§3.2/§6) and glass-on-glass is banned (§5). */}
       <Card className="bento-full glass accent-bg-ai">
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
           <div>
             <CardTitle className="text-headline">AI Explanation</CardTitle>
             <p className="text-caption text-text-tertiary">
               Plain-language commentary on calculated results. Read-only — never alters a computed value.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
             <Button variant="ghost" size="sm" onClick={() => newChat(source)} disabled={!messages.length || pending}>
               New chat
             </Button>
@@ -200,7 +200,7 @@ export function ModuleD() {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-5">
+        <CardContent className="space-y-4 sm:space-y-5">
           {/* Module source selector */}
           <div className="flex flex-wrap items-center gap-2">
             {SOURCES.map((s) => (
@@ -208,7 +208,7 @@ export function ModuleD() {
                 {s.id} · {s.label}
               </PillButton>
             ))}
-            <span className="ml-auto text-micro text-text-tertiary">
+            <span className="w-full sm:w-auto sm:ml-auto text-micro text-text-tertiary">
               {stored.live
                 ? "Reading live results from Module " + source
                 : "Sample values (Module " + source + " not run yet)"}
@@ -216,7 +216,7 @@ export function ModuleD() {
           </div>
 
           {/* Calculated outputs being explained (FR-D4: numbers separated from AI text) */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-4 sm:grid-cols-4">
             {resultStats(stored.result).map((s) => (
               <Stat key={s.label} {...s} />
             ))}
@@ -225,7 +225,7 @@ export function ModuleD() {
           {/* Conversation transcript — solid surface (dense text, §3.2/§6) */}
           <div
             ref={scrollRef}
-            className="flex max-h-[26rem] min-h-60 flex-col gap-4 overflow-y-auto rounded-lg border border-border-subtle bg-surface-1 p-5"
+            className="flex max-h-[22rem] sm:max-h-[26rem] min-h-52 sm:min-h-60 flex-col gap-3 sm:gap-4 overflow-y-auto rounded-lg border border-border-subtle bg-surface-1 p-3.5 sm:p-5"
           >
             {!enabled ? (
               <div className="m-auto max-w-md text-center">
@@ -246,7 +246,7 @@ export function ModuleD() {
                 {/* Opening explanation from the AI */}
                 {rendered.map(({ msg, questionNo }, i) =>
                   msg.role === "assistant" ? (
-                    <div key={i} className="flex max-w-[80%] flex-col gap-2 self-start">
+                    <div key={i} className="flex max-w-[92%] sm:max-w-[80%] flex-col gap-2 self-start">
                       <div className="flex items-center gap-2">
                         <span className="text-micro font-medium text-[var(--accent-ai)]">AI</span>
                         <Badge
@@ -256,14 +256,14 @@ export function ModuleD() {
                           {msg.used === "llm" ? "live" : "template"}
                         </Badge>
                       </div>
-                      <div className="rounded-md border border-border-subtle bg-surface-2 p-4">
+                      <div className="rounded-md border border-border-subtle bg-surface-2 p-3 sm:p-4">
                         <p className="text-body leading-relaxed text-text-primary">{msg.text}</p>
                       </div>
                     </div>
                   ) : (
-                    <div key={i} className="flex max-w-[80%] flex-col items-end gap-1 self-end">
+                    <div key={i} className="flex max-w-[92%] sm:max-w-[80%] flex-col items-end gap-1 self-end">
                       <span className="text-micro text-text-tertiary">Question {questionNo}</span>
-                      <p className="rounded-md bg-surface-2 px-4 py-2.5 text-right text-body leading-relaxed text-text-primary">
+                      <p className="rounded-md bg-surface-2 px-3 sm:px-4 py-2 sm:py-2.5 text-right text-body leading-relaxed text-text-primary">
                         {msg.text}
                       </p>
                     </div>

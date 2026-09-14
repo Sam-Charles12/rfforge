@@ -42,9 +42,9 @@ export function FScaleChart({ result, fminGHz, fmaxGHz }: FScaleChartProps) {
   const bandLines = BANDS.filter((b) => b.hz / 1e9 >= fminGHz && b.hz / 1e9 <= fmaxGHz)
 
   return (
-    <div className="h-[380px] w-full">
+    <div className="h-[280px] sm:h-[380px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 16, right: 16, bottom: 8, left: 0 }}>
+        <LineChart data={data} margin={{ top: 16, right: 8, bottom: 8, left: -4 }}>
           <CartesianGrid stroke={GRID_COLOR} vertical={false} />
           <XAxis
             dataKey="fGHz"
@@ -62,7 +62,7 @@ export function FScaleChart({ result, fminGHz, fmaxGHz }: FScaleChartProps) {
             tick={AXIS_TICK}
             tickLine={false}
             axisLine={false}
-            width={44}
+            width={40}
             domain={[0, "auto"]}
             tickFormatter={(v) => `${v}`}
             label={{ value: "Insertion loss (dB)", angle: -90, position: "insideLeft", offset: 8, fontSize: 11, fill: "var(--chart-axis)" }}
@@ -74,7 +74,7 @@ export function FScaleChart({ result, fminGHz, fmaxGHz }: FScaleChartProps) {
             tick={AXIS_TICK}
             tickLine={false}
             axisLine={false}
-            width={40}
+            width={36}
             tickFormatter={(v) => `${v}`}
             label={{ value: "Inductor Q", angle: 90, position: "insideRight", offset: 8, fontSize: 11, fill: "var(--chart-axis)" }}
           />

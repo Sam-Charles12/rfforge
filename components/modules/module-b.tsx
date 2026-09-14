@@ -83,7 +83,7 @@ export function ModuleB() {
           <CardTitle className="text-headline">PA Parameters</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="DC supply" unit="W">
               <Input value={form.pDcW} onChange={set("pDcW")} inputMode="decimal" className="numeric" />
             </Field>
@@ -91,7 +91,7 @@ export function ModuleB() {
               <Input value={form.gainDb} onChange={set("gainDb")} inputMode="decimal" className="numeric" />
             </Field>
           </div>
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Saturation power" unit="dBm">
               <Input value={form.psatDbm} onChange={set("psatDbm")} inputMode="decimal" className="numeric" />
             </Field>
@@ -99,7 +99,7 @@ export function ModuleB() {
               <Input value={form.pInStartDbm} onChange={set("pInStartDbm")} inputMode="decimal" className="numeric" />
             </Field>
           </div>
-          <div className="grid grid-cols-2 items-end gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-end gap-3 sm:gap-4">
             <Field label="Sweep end" unit="dBm">
               <Input value={form.pInEndDbm} onChange={set("pInEndDbm")} inputMode="decimal" className="numeric" />
             </Field>
@@ -107,12 +107,13 @@ export function ModuleB() {
               <Input value={form.smoothness} onChange={set("smoothness")} inputMode="decimal" className="numeric" />
             </Field>
           </div>
-          <div className="flex items-center justify-between gap-3 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
             <Badge variant="secondary">{form.deviceType === "fet" ? "FET" : "BJT"}</Badge>
             <Button
               type="button"
               variant="outline"
               size="sm"
+              className="text-xs"
               title="Click to switch device type: controls whether efficiency is labelled as Drain (FET) or Collector (BJT)"
               aria-label="Switch device type between FET and BJT"
               onClick={() =>
@@ -137,7 +138,7 @@ export function ModuleB() {
         <CardHeader>
           <CardTitle className="text-headline">Figures of Merit</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-6">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
           <StatCard label="Saturation" value={formatDbm(result?.pSatDbm)} unit="dBm" />
           <StatCard
             label="P1dB (out)"
@@ -156,10 +157,10 @@ export function ModuleB() {
 
       {/* Primary chart — spans the full bento width */}
       <Card className="bento-full glass accent-bg-rf-power">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <CardTitle className="text-headline">P_out / Gain / PAE vs P_in</CardTitle>
           {result && (
-            <Badge variant="outline">
+            <Badge variant="outline" className="w-fit">
               P1dB: {result.p1dB.pInDbm.toFixed(1)} dBm in · {result.p1dB.pOutDbm.toFixed(1)} dBm out
             </Badge>
           )}
@@ -197,7 +198,7 @@ function StatCard({
 }) {
   return (
     <Card
-      className={`flex flex-col justify-between rounded-lg border bg-surface-1 p-6 ${
+      className={`flex flex-col justify-between rounded-lg border bg-surface-1 p-4 sm:p-5 lg:p-6 ${
         accent ? "accent-bg-rf-freq" : "border-border-subtle"
       }`}
     >
